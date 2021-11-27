@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Orders</h1>
+<div th:each="order : ${orders}">
+    <form th:method="DELETE" th:action="@{/routes/profile/{id}(id=${order.getId()})}">
+        <label th:text="${'Route: ' + order.getTicket().getRoute() + ' Date: '
+        + order.getTicket().getDate() + ' Amount: ' + order.getAmount()}">order</label>
+        <input type="submit" value="Delete"/>
+    </form>
+</div>
+<form th:action="@{/routes}">
+    <button>Routes</button>
+</form>
+</body>
+</html>

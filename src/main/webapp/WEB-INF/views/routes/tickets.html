@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="container">
+    <form th:method="POST" th:action="@{/routes/{id}(id=${id})}" th:object="${order}">
+            <div th:each="ticket : ${tickets}">
+                    <input type="radio" th:field="*{ticket.id}" th:value="${ticket.id}">
+                    <label th:for="${#ids.prev('ticket.id')}" th:text="${ticket.getDate()}"></label>
+            </div>
+        <div style="color:red" th:if="${#fields.hasErrors('ticket')}" th:errors="*{ticket}">Ticket Error</div>
+        <div style="color:red" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">Amount Error</div>
+        <label for="amount">Enter amount: </label>
+        <input type="text" th:field="*{amount}" id="amount"/>
+        <br>
+        <input type="submit" value="Buy"/>
+    </form>
+</div>
+<br>
+<form th:action="@{/routes}">
+    <button>Routes</button>
+</form>
+</body>
+</html>
