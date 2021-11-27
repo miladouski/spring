@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Sign Out"/>
+    </form>
+    <form th:action="@{/routes/profile}">
+        <button>Profile</button>
+    </form>
+</div>
+<br>
+<div th:each="route : ${routes}">
+    <a th:href="@{/routes/{id}(id=${route.getKey()})}"
+       th:text="${route.getValue()}">route</a>
+</div>
+</body>
+</html>
