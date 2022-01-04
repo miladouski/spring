@@ -19,7 +19,7 @@ public class ExceptionHandlerFilter extends GenericFilterBean {
         try {
             filterChain.doFilter(servletRequest, servletResponse);
         } catch(AuthenticationException e) {
-            ((HttpServletResponse) servletResponse).setStatus(43);
+            ((HttpServletResponse) servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             servletResponse.getWriter().write(e.getMessage());
         }
     }
