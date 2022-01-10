@@ -4,6 +4,7 @@ import com.spring.booking.models.Account;
 import com.spring.booking.models.Order;
 import com.spring.booking.service.AccountService;
 import com.spring.booking.service.OrderService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class ProfileController {
     }
 
     @PutMapping("/edit")
-    public void editProfile(@RequestBody Account account) {
+    public void editProfile(@Validated @RequestBody Account account) {
         accountService.editProfile(account);
     }
 }

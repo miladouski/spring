@@ -1,10 +1,10 @@
 package com.spring.booking.controllers;
 
+import com.spring.booking.exceptions.JwtAuthenticationException;
 import com.spring.booking.models.Account;
 import com.spring.booking.models.responses.AuthenticationResponse;
 import com.spring.booking.security.JwtTokenProvider;
 import com.spring.booking.service.AccountService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,15 +33,10 @@ public class AuthorizationController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody Account request) {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            UserDetails account = accountService.loadUserByUsername(request.getUsername());
-            String token = jwtTokenProvider.createToken(account.getUsername());
-            return ResponseEntity.ok(new AuthenticationResponse(account.getUsername(), token));
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid username/password combination");
-
-        }
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        UserDetails account = accountService.loadUserByUsername(request.getUsername());
+        String token = jwtTokenProvider.createToken(account.getUsername());
+        return ResponseEntity.ok(new AuthenticationResponse(account.getUsername(), token));
     }
 
     @PostMapping("/logout")

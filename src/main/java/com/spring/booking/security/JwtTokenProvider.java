@@ -1,6 +1,6 @@
 package com.spring.booking.security;
 
-import com.spring.booking.exceptions.AuthenticationException;
+import com.spring.booking.exceptions.JwtAuthenticationException;
 import com.spring.booking.service.AccountService;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +47,7 @@ public class JwtTokenProvider {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claimsJws.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
-            throw new AuthenticationException("JWT token is expired or invalid");
+            throw new JwtAuthenticationException("JWT token is expired or invalid");
         }
     }
 
@@ -56,7 +56,7 @@ public class JwtTokenProvider {
         if(account != null) {
             return new UsernamePasswordAuthenticationToken(account, "", account.getAuthorities());
         } else {
-            throw new AuthenticationException("JWT token is expired");
+            throw new JwtAuthenticationException("JWT token is expired");
         }
     }
 

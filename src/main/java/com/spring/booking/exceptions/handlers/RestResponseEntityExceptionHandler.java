@@ -1,13 +1,15 @@
 package com.spring.booking.exceptions.handlers;
 
-import com.spring.booking.exceptions.AuthenticationException;
+import com.spring.booking.exceptions.JwtAuthenticationException;
 import com.spring.booking.exceptions.FileWriteException;
 import com.spring.booking.exceptions.RegistrationException;
 import com.spring.booking.exceptions.WrongArgumentException;
 import com.spring.booking.models.responses.ErrorResponse;
+import org.hibernate.TransientPropertyValueException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,8 +19,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException e) {
+    @ExceptionHandler(JwtAuthenticationException.class)
+    public ResponseEntity<Object> handleAuthenticationException(JwtAuthenticationException e) {
         return new ResponseEntity<>(new ErrorResponse(43, "AUTHENTICATION_ERROR", e.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
@@ -35,6 +37,16 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(RegistrationException.class)
     public ResponseEntity<Object> handleRegistrationException(RegistrationException e) {
         return new ResponseEntity<>(new ErrorResponse(42, "REGISTRATION_ERROR", e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException e) {
+        return new ResponseEntity<>(new ErrorResponse(40, "LOGIN_ERROR", e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(TransientPropertyValueException.class)
+    public ResponseEntity<Object> handleTransientPropertyValueException(TransientPropertyValueException e) {
+        return new ResponseEntity<>(new ErrorResponse(41, "WRONG_ARGUMENT", e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @Override

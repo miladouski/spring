@@ -1,11 +1,8 @@
 package com.spring.booking.exceptions;
 
-import lombok.Getter;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-@Getter
-public class JwtAuthenticationException extends Exception {
-
+public class JwtAuthenticationException extends RuntimeException{
     public JwtAuthenticationException() {
     }
 
@@ -23,5 +20,10 @@ public class JwtAuthenticationException extends Exception {
 
     public JwtAuthenticationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    @Override
+    public String getMessage() {
+        return super.getMessage();
     }
 }

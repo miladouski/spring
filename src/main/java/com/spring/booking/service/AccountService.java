@@ -1,10 +1,11 @@
 package com.spring.booking.service;
 
+import com.spring.booking.exceptions.JwtAuthenticationException;
 import com.spring.booking.exceptions.RegistrationException;
+import com.spring.booking.exceptions.WrongArgumentException;
 import com.spring.booking.models.Account;
 import com.spring.booking.models.AccountPhoto;
 import com.spring.booking.models.responses.ReportResponse;
-import com.spring.booking.repository.AccountPhotoRepository;
 import com.spring.booking.repository.AccountRepository;
 import com.spring.booking.repository.OrderRepository;
 import com.spring.booking.repository.RoleRepository;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,16 +28,14 @@ public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
     private final OrderRepository orderRepository;
-    private final AccountPhotoRepository accountPhotoRepository;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public AccountService(AccountRepository accountRepository, RoleRepository roleRepository, OrderRepository orderRepository, AccountPhotoRepository accountPhotoRepository) {
+    public AccountService(AccountRepository accountRepository, RoleRepository roleRepository, OrderRepository orderRepository) {
         this.accountRepository = accountRepository;
         this.roleRepository = roleRepository;
         this.orderRepository = orderRepository;
-        this.accountPhotoRepository = accountPhotoRepository;
     }
 
     public void saveAccount(Account account) {
@@ -55,17 +55,22 @@ public class AccountService implements UserDetailsService {
     }
 
     public Account getCurrentAccount() {
-        return loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        return accountRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
     public void changeStatus(Account request) {
-        Account account = accountRepository.getById(request.getId());
-        account.setStatus(request.isEnabled());
-        accountRepository.save(account);
+        Optional<Account> account = accountRepository.findById(request.getId());
+        if (!account.isPresent()) {
+            throw new WrongArgumentException("Account not found");
+        }
+        account.get().setStatus(request.isEnabled());
+        accountRepository.save(account.get());
     }
 
     public void changePhoto(byte[] photo) {
-        accountPhotoRepository.save(new AccountPhoto(getCurrentAccount().getId(), photo, getCurrentAccount()));
+       Account account = accountRepository.getById(getCurrentAccount().getId());
+       account.setAccountPhoto(new AccountPhoto(getCurrentAccount().getId(), photo, getCurrentAccount()));
+       accountRepository.save(account);
     }
 
     public void editProfile(Account form) {
@@ -86,7 +91,11 @@ public class AccountService implements UserDetailsService {
     }
 
     public void editRoles(Account form) {
-        Account account = accountRepository.getById(form.getId());
+        Optional<Account> optional = accountRepository.findById(form.getId());
+        if (!optional.isPresent()) {
+            throw new WrongArgumentException("Account not found");
+        }
+        Account account = optional.get();
         account.setRoles(form.getRoles());
         accountRepository.save(account);
     }
@@ -101,6 +110,10 @@ public class AccountService implements UserDetailsService {
 
     @Override
     public Account loadUserByUsername(String username) throws UsernameNotFoundException {
-        return accountRepository.findByUsername(username);
+        Account account = accountRepository.findByUsername(username);
+        if(account == null) {
+            throw new JwtAuthenticationException("Account does not exist");
+        }
+        return account;
     }
 }
